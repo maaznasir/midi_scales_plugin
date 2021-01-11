@@ -11,6 +11,9 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
+
+#include "ScalesKeyboardComponent.h"
+
 //==============================================================================
 /**
 */
@@ -27,7 +30,10 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    MidiScalesPluginAudioProcessor& audioProcessor;
+    MidiScalesPluginAudioProcessor& m_audioProcessor;
+    
+    ScalesKeyboardComponent m_keyboardComponent;
+    juce::Label m_selectedChord;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiScalesPluginAudioProcessorEditor)
 };

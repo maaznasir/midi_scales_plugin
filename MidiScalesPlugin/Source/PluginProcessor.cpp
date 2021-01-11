@@ -22,6 +22,7 @@ MidiScalesPluginAudioProcessor::MidiScalesPluginAudioProcessor()
                        )
 #endif
 {
+    m_keyboardState.reset();
 }
 
 MidiScalesPluginAudioProcessor::~MidiScalesPluginAudioProcessor()
@@ -129,24 +130,82 @@ bool MidiScalesPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 
 void MidiScalesPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
-    
     buffer.clear();
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    juce::MidiBuffer processedMidi;
+    juce::MidiBuffer keyboardStateMidi;
+    int time;
+    juce::MidiMessage m, m1, m2, m3, k1, k2, k3;
+    
+    for (juce::MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
+        //Custom messaging
+        
+        // Major Triad Indices
+        const int iFirstIdx = 0;
+        const int iThirdIdx = 4;
+        const int iFifthIdx = 7;
+        
+        if (m.isNoteOn())
+        {
+            const int iFirstNote = (m.getNoteNumber() + iFirstIdx) % SCALES_TOTAL_STEPS;
+            const int iThirdNote = (m.getNoteNumber() + iThirdIdx) % SCALES_TOTAL_STEPS;
+            const int iFifthNote = (m.getNoteNumber() + iFifthIdx) % SCALES_TOTAL_STEPS;
+            
+            m1 = juce::MidiMessage::noteOn(m.getChannel(), iFirstNote, m.getVelocity());
+            m1.setTimeStamp(m.getTimeStamp());
+            m2 = juce::MidiMessage::noteOn(m.getChannel(), iThirdNote, m.getVelocity());
+            m2.setTimeStamp(m.getTimeStamp());
+            m3 = juce::MidiMessage::noteOn(m.getChannel(), iFifthNote, m.getVelocity());
+            m3.setTimeStamp(m.getTimeStamp());
+            
+            const int iAdjustedFirst = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iFirstIdx) % SCALES_OCTAVE_STEPS_RANGE;
+            const int iAdjustedThird = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iThirdIdx) % SCALES_OCTAVE_STEPS_RANGE;
+            const int iAdjustedFifth = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iFifthIdx) % SCALES_OCTAVE_STEPS_RANGE;
+            
+            k1 = juce::MidiMessage::noteOn(m.getChannel(), iAdjustedFirst, m.getVelocity());
+            k1.setTimeStamp(m.getTimeStamp());
+            k2 = juce::MidiMessage::noteOn(m.getChannel(), iAdjustedThird, m.getVelocity());
+            k2.setTimeStamp(m.getTimeStamp());
+            k3 = juce::MidiMessage::noteOn(m.getChannel(), iAdjustedFifth, m.getVelocity());
+            k3.setTimeStamp(m.getTimeStamp());
+        }
+        else if (m.isNoteOff())
+        {
+            const int iFirstNote = (m.getNoteNumber() + iFirstIdx) % SCALES_TOTAL_STEPS;
+            const int iThirdNote = (m.getNoteNumber() + iThirdIdx) % SCALES_TOTAL_STEPS;
+            const int iFifthNote = (m.getNoteNumber() + iFifthIdx) % SCALES_TOTAL_STEPS;
+            
+            m1 = juce::MidiMessage::noteOff(m.getChannel(), iFirstNote, m.getVelocity());
+            m1.setTimeStamp(m.getTimeStamp());
+            m2 = juce::MidiMessage::noteOff(m.getChannel(), iThirdNote, m.getVelocity());
+            m2.setTimeStamp(m.getTimeStamp());
+            m3 = juce::MidiMessage::noteOff(m.getChannel(), iFifthNote, m.getVelocity());
+            m3.setTimeStamp(m.getTimeStamp());
+            
+            const int iAdjustedFirst = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iFirstIdx) % SCALES_OCTAVE_STEPS_RANGE;
+            const int iAdjustedThird = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iThirdIdx) % SCALES_OCTAVE_STEPS_RANGE;
+            const int iAdjustedFifth = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iFifthIdx) % SCALES_OCTAVE_STEPS_RANGE;
+            
+            k1 = juce::MidiMessage::noteOff(m.getChannel(), iAdjustedFirst, m.getVelocity());
+            k1.setTimeStamp(m.getTimeStamp());
+            k2 = juce::MidiMessage::noteOff(m.getChannel(), iAdjustedThird, m.getVelocity());
+            k2.setTimeStamp(m.getTimeStamp());
+            k3 = juce::MidiMessage::noteOff(m.getChannel(), iAdjustedFifth, m.getVelocity());
+            k3.setTimeStamp(m.getTimeStamp());
+        }
+        
+        processedMidi.addEvent (m1, time);
+        processedMidi.addEvent (m2, time);
+        processedMidi.addEvent (m3, time);
+        keyboardStateMidi.addEvent (k1, time);
+        keyboardStateMidi.addEvent (k2, time);
+        keyboardStateMidi.addEvent (k3, time);
     }
+    
+    midiMessages.swapWith (processedMidi);
+    
+    m_keyboardState.processNextMidiBuffer (keyboardStateMidi, 0, buffer.getNumSamples(), true);
 }
 
 //==============================================================================

@@ -77,6 +77,10 @@
 			isa = PBXBuildFile;
 			fileRef = 11B853D8531D446A305288D0;
 		};
+		EE4CF01A9BA2F29BA3B2E945 = {
+			isa = PBXBuildFile;
+			fileRef = ABA890BD7F0937540CA01511;
+		};
 		ECA2F466AE3953379F7B04CE = {
 			isa = PBXBuildFile;
 			fileRef = C9827A2E7CF09C7C2BB0079B;
@@ -311,6 +315,13 @@
 			path = System/Library/Frameworks/CoreMIDI.framework;
 			sourceTree = SDKROOT;
 		};
+		6A0D3599B18DCC128A894006 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			name = "juce_audio_plugin_client";
+			path = "/Users/maaz/JUCE/JUCE/modules/juce_audio_plugin_client";
+			sourceTree = "<absolute>";
+		};
 		6AF842D92A0CF775222FAB02 = {
 			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
@@ -359,13 +370,6 @@
 			name = "include_juce_audio_plugin_client_Standalone.cpp";
 			path = "../../JuceLibraryCode/include_juce_audio_plugin_client_Standalone.cpp";
 			sourceTree = "SOURCE_ROOT";
-		};
-		6A0D3599B18DCC128A894006 = {
-			isa = PBXFileReference;
-			lastKnownFileType = file;
-			name = "juce_audio_plugin_client";
-			path = "/Users/maaz/JUCE/JUCE/modules/juce_audio_plugin_client";
-			sourceTree = "<absolute>";
 		};
 		6B1966279F8501709DCDEBD7 = {
 			isa = PBXFileReference;
@@ -421,6 +425,13 @@
 			lastKnownFileType = sourcecode.cpp.objcpp;
 			name = "include_juce_audio_plugin_client_VST_utils.mm";
 			path = "../../JuceLibraryCode/include_juce_audio_plugin_client_VST_utils.mm";
+			sourceTree = "SOURCE_ROOT";
+		};
+		ABA890BD7F0937540CA01511 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ScalesKeyboardComponent.cpp;
+			path = ../../Source/ScalesKeyboardComponent.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		B0EB594937C2091AF18A1C29 = {
@@ -484,6 +495,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = PluginEditor.cpp;
 			path = ../../Source/PluginEditor.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		C1615FFF3C36B84B5EBC9CEC = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ScalesKeyboardComponent.h;
+			path = ../../Source/ScalesKeyboardComponent.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		C35814C2ACAB689A1D9C3DF2 = {
@@ -559,6 +577,8 @@
 		00B7F238B765983F47DCA658 = {
 			isa = PBXGroup;
 			children = (
+				ABA890BD7F0937540CA01511,
+				C1615FFF3C36B84B5EBC9CEC,
 				C9827A2E7CF09C7C2BB0079B,
 				21D86B40B44D80DA45B73B11,
 				C113A3450FE76722A1389848,
@@ -1982,6 +2002,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EE4CF01A9BA2F29BA3B2E945,
 				ECA2F466AE3953379F7B04CE,
 				A91817C47C67FD315280AFC1,
 				AE9EDCA67B370142479440AB,

@@ -13,6 +13,12 @@
 //==============================================================================
 /**
 */
+#define SCALES_OCTAVE_STEPS_RANGE 25
+#define SCALES_OCTAVE_STEPS 12
+#define SCALES_DOUBLE_OCTAVE_STEPS 24
+#define SCALES_OCTAVE_NORMALIZED_START 0
+#define SCALES_TOTAL_STEPS 128
+
 class MidiScalesPluginAudioProcessor  : public juce::AudioProcessor
 {
 public:
@@ -52,8 +58,11 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    juce::MidiKeyboardState m_keyboardState;
 
 private:
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiScalesPluginAudioProcessor)
 };
