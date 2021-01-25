@@ -77,6 +77,14 @@
 			isa = PBXBuildFile;
 			fileRef = 11B853D8531D446A305288D0;
 		};
+		EA45B527900D574BB7D86C9A = {
+			isa = PBXBuildFile;
+			fileRef = 41A04C54874545C561108634;
+		};
+		4FD4616B5846DCAC0EDB5A8A = {
+			isa = PBXBuildFile;
+			fileRef = C9687F3492FEC9BD9F141AA6;
+		};
 		EE4CF01A9BA2F29BA3B2E945 = {
 			isa = PBXBuildFile;
 			fileRef = ABA890BD7F0937540CA01511;
@@ -273,6 +281,13 @@
 			path = ../../JuceLibraryCode/JucePluginDefines.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		41A04C54874545C561108634 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Utilities.cpp;
+			path = ../../Source/Utilities.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		424808B9786C96DF01EEC2E9 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file;
@@ -293,6 +308,13 @@
 			name = Foundation.framework;
 			path = System/Library/Frameworks/Foundation.framework;
 			sourceTree = SDKROOT;
+		};
+		51851943E3BF66D144A2D36E = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Utilities.h;
+			path = ../../Source/Utilities.h;
+			sourceTree = "SOURCE_ROOT";
 		};
 		56157C9124BCC7F2ED30A9B6 = {
 			isa = PBXFileReference;
@@ -413,6 +435,13 @@
 			path = "../../JuceLibraryCode/include_juce_audio_devices.mm";
 			sourceTree = "SOURCE_ROOT";
 		};
+		98E498D0DF29C1653184DF0A = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = PressedChord.h;
+			path = ../../Source/PressedChord.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		9BEC8D58236F9756FFA7216A = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -511,6 +540,13 @@
 			path = System/Library/Frameworks/WebKit.framework;
 			sourceTree = SDKROOT;
 		};
+		C9687F3492FEC9BD9F141AA6 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = PressedChord.cpp;
+			path = ../../Source/PressedChord.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		C9827A2E7CF09C7C2BB0079B = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -577,6 +613,10 @@
 		00B7F238B765983F47DCA658 = {
 			isa = PBXGroup;
 			children = (
+				41A04C54874545C561108634,
+				51851943E3BF66D144A2D36E,
+				C9687F3492FEC9BD9F141AA6,
+				98E498D0DF29C1653184DF0A,
 				ABA890BD7F0937540CA01511,
 				C1615FFF3C36B84B5EBC9CEC,
 				C9827A2E7CF09C7C2BB0079B,
@@ -2002,6 +2042,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA45B527900D574BB7D86C9A,
+				4FD4616B5846DCAC0EDB5A8A,
 				EE4CF01A9BA2F29BA3B2E945,
 				ECA2F466AE3953379F7B04CE,
 				A91817C47C67FD315280AFC1,

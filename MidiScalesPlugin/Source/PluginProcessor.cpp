@@ -8,6 +8,8 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "Utilities.h"
+#include "PressedChord.h"
 
 //==============================================================================
 MidiScalesPluginAudioProcessor::MidiScalesPluginAudioProcessor()
@@ -23,6 +25,10 @@ MidiScalesPluginAudioProcessor::MidiScalesPluginAudioProcessor()
 #endif
 {
     m_keyboardState.reset();
+    
+    m_iScaleNote.set(-1);
+    m_ScaleType.set(Scales::Type::Invalid);
+    m_ChordType.set(Chords::Type::Invalid);
 }
 
 MidiScalesPluginAudioProcessor::~MidiScalesPluginAudioProcessor()
@@ -134,73 +140,39 @@ void MidiScalesPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
 
     juce::MidiBuffer processedMidi;
     juce::MidiBuffer keyboardStateMidi;
-    int time;
-    juce::MidiMessage m, m1, m2, m3, k1, k2, k3;
+    int iSamplePosition;
+    juce::MidiMessage m;
     
-    for (juce::MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
+    // Start - Atomic Variable Access
+    
+    Chords::Type::eType chordType = m_ChordType.get();
+    
+    // End - Atomic Variable Access
+    
+    if(chordType == Chords::Type::Invalid)
+        return;
+    
+    for (juce::MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, iSamplePosition);)
     {
-        //Custom messaging
-        
-        // Major Triad Indices
-        const int iFirstIdx = 0;
-        const int iThirdIdx = 4;
-        const int iFifthIdx = 7;
-        
-        if (m.isNoteOn())
+        if(m.isNoteOn())
         {
-            const int iFirstNote = (m.getNoteNumber() + iFirstIdx) % SCALES_TOTAL_STEPS;
-            const int iThirdNote = (m.getNoteNumber() + iThirdIdx) % SCALES_TOTAL_STEPS;
-            const int iFifthNote = (m.getNoteNumber() + iFifthIdx) % SCALES_TOTAL_STEPS;
+            if(m_currentChord.IsValid())
+            {
+                m_currentChord.GenerateMidi(false , iSamplePosition-1, m.getTimeStamp(), processedMidi, keyboardStateMidi);
+                m_currentChord.Reset();
+            }
             
-            m1 = juce::MidiMessage::noteOn(m.getChannel(), iFirstNote, m.getVelocity());
-            m1.setTimeStamp(m.getTimeStamp());
-            m2 = juce::MidiMessage::noteOn(m.getChannel(), iThirdNote, m.getVelocity());
-            m2.setTimeStamp(m.getTimeStamp());
-            m3 = juce::MidiMessage::noteOn(m.getChannel(), iFifthNote, m.getVelocity());
-            m3.setTimeStamp(m.getTimeStamp());
-            
-            const int iAdjustedFirst = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iFirstIdx) % SCALES_OCTAVE_STEPS_RANGE;
-            const int iAdjustedThird = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iThirdIdx) % SCALES_OCTAVE_STEPS_RANGE;
-            const int iAdjustedFifth = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iFifthIdx) % SCALES_OCTAVE_STEPS_RANGE;
-            
-            k1 = juce::MidiMessage::noteOn(m.getChannel(), iAdjustedFirst, m.getVelocity());
-            k1.setTimeStamp(m.getTimeStamp());
-            k2 = juce::MidiMessage::noteOn(m.getChannel(), iAdjustedThird, m.getVelocity());
-            k2.setTimeStamp(m.getTimeStamp());
-            k3 = juce::MidiMessage::noteOn(m.getChannel(), iAdjustedFifth, m.getVelocity());
-            k3.setTimeStamp(m.getTimeStamp());
+            m_currentChord.Setup(m.getNoteNumber(), m.getChannel(), chordType, m.getVelocity(), m.getTimeStamp());
+            m_currentChord.GenerateMidi(true , iSamplePosition, m.getTimeStamp(), processedMidi, keyboardStateMidi);
         }
-        else if (m.isNoteOff())
+        else if(m.isNoteOff())
         {
-            const int iFirstNote = (m.getNoteNumber() + iFirstIdx) % SCALES_TOTAL_STEPS;
-            const int iThirdNote = (m.getNoteNumber() + iThirdIdx) % SCALES_TOTAL_STEPS;
-            const int iFifthNote = (m.getNoteNumber() + iFifthIdx) % SCALES_TOTAL_STEPS;
-            
-            m1 = juce::MidiMessage::noteOff(m.getChannel(), iFirstNote, m.getVelocity());
-            m1.setTimeStamp(m.getTimeStamp());
-            m2 = juce::MidiMessage::noteOff(m.getChannel(), iThirdNote, m.getVelocity());
-            m2.setTimeStamp(m.getTimeStamp());
-            m3 = juce::MidiMessage::noteOff(m.getChannel(), iFifthNote, m.getVelocity());
-            m3.setTimeStamp(m.getTimeStamp());
-            
-            const int iAdjustedFirst = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iFirstIdx) % SCALES_OCTAVE_STEPS_RANGE;
-            const int iAdjustedThird = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iThirdIdx) % SCALES_OCTAVE_STEPS_RANGE;
-            const int iAdjustedFifth = ((m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS) + iFifthIdx) % SCALES_OCTAVE_STEPS_RANGE;
-            
-            k1 = juce::MidiMessage::noteOff(m.getChannel(), iAdjustedFirst, m.getVelocity());
-            k1.setTimeStamp(m.getTimeStamp());
-            k2 = juce::MidiMessage::noteOff(m.getChannel(), iAdjustedThird, m.getVelocity());
-            k2.setTimeStamp(m.getTimeStamp());
-            k3 = juce::MidiMessage::noteOff(m.getChannel(), iAdjustedFifth, m.getVelocity());
-            k3.setTimeStamp(m.getTimeStamp());
+            if(m_currentChord.IsValid() && m_currentChord.GetRootNote() == m.getNoteNumber())
+            {
+                m_currentChord.GenerateMidi(false, iSamplePosition, m.getTimeStamp(), processedMidi, keyboardStateMidi);
+                m_currentChord.Reset();
+            }
         }
-        
-        processedMidi.addEvent (m1, time);
-        processedMidi.addEvent (m2, time);
-        processedMidi.addEvent (m3, time);
-        keyboardStateMidi.addEvent (k1, time);
-        keyboardStateMidi.addEvent (k2, time);
-        keyboardStateMidi.addEvent (k3, time);
     }
     
     midiMessages.swapWith (processedMidi);

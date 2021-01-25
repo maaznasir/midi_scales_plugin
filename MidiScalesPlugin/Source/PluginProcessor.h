@@ -8,16 +8,12 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+#include "Utilities.h"
+#include "PressedChord.h"
 
 //==============================================================================
 /**
 */
-#define SCALES_OCTAVE_STEPS_RANGE 25
-#define SCALES_OCTAVE_STEPS 12
-#define SCALES_DOUBLE_OCTAVE_STEPS 24
-#define SCALES_OCTAVE_NORMALIZED_START 0
-#define SCALES_TOTAL_STEPS 128
 
 class MidiScalesPluginAudioProcessor  : public juce::AudioProcessor
 {
@@ -60,8 +56,13 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
     
     juce::MidiKeyboardState m_keyboardState;
+    juce::Atomic<int> m_iScaleNote;
+    juce::Atomic<Scales::Type::eType> m_ScaleType;
+    juce::Atomic<Chords::Type::eType> m_ChordType;
 
 private:
+    
+    PressedChord m_currentChord;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiScalesPluginAudioProcessor)

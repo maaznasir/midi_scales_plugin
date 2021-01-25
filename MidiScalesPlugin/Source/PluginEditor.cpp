@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "Utilities.h"
 
 //==============================================================================
 MidiScalesPluginAudioProcessorEditor::MidiScalesPluginAudioProcessorEditor (MidiScalesPluginAudioProcessor& p)
@@ -19,12 +20,24 @@ MidiScalesPluginAudioProcessorEditor::MidiScalesPluginAudioProcessorEditor (Midi
     // editor's size to whatever you need it to be.
     setSize (800, 600);
     
-    addAndMakeVisible (m_selectedChord);
+    /*addAndMakeVisible (m_selectedChord);
     m_selectedChord.setText ("C Major - Happy, Innocent", juce::dontSendNotification);
-    m_selectedChord.setFont (juce::Font (20.0f, juce::Font::plain));
+    m_selectedChord.setFont (juce::Font (16.0f, juce::Font::plain));
     m_selectedChord.setColour (juce::Label::backgroundColourId, juce::Colours::white);
     m_selectedChord.setColour (juce::Label::textColourId, juce::Colours::black);
-    m_selectedChord.setJustificationType (juce::Justification::centred);
+    m_selectedChord.setJustificationType (juce::Justification::centred);*/
+    
+    addAndMakeVisible (m_ScaleLabel);
+    m_ScaleLabel.setText ("Scale: ", juce::dontSendNotification);
+    m_ScaleLabel.setFont (juce::Font (16.0f, juce::Font::plain));
+    m_ScaleLabel.setColour (juce::Label::backgroundColourId, juce::Colours::white);
+    m_ScaleLabel.setColour (juce::Label::textColourId, juce::Colours::black);
+    
+    addAndMakeVisible (m_ChordLabel);
+    m_ChordLabel.setText ("Chord: ", juce::dontSendNotification);
+    m_ChordLabel.setFont (juce::Font (16.0f, juce::Font::plain));
+    m_ChordLabel.setColour (juce::Label::backgroundColourId, juce::Colours::white);
+    m_ChordLabel.setColour (juce::Label::textColourId, juce::Colours::black);
     
     addAndMakeVisible (m_keyboardComponent);
     m_keyboardComponent.setScrollButtonsVisible(false);
@@ -32,6 +45,37 @@ MidiScalesPluginAudioProcessorEditor::MidiScalesPluginAudioProcessorEditor (Midi
                                           SCALES_OCTAVE_NORMALIZED_START +
                                           SCALES_OCTAVE_STEPS_RANGE - 1);
     m_keyboardComponent.setKeyWidth(46);
+    
+    
+    addAndMakeVisible (m_ChordType);
+    for(int i = 1; i <= Chords::Type::Total; i++)
+    {
+        Chords::Type::eType chordType = (Chords::Type::eType) i;
+        m_ChordType.addItem (Helpers::GetChordTypeString(chordType),  chordType);
+    }
+    m_ChordType.setSelectedId(Chords::Type::MajorTriad);
+    m_ChordType.onChange = [this] { ChordTypeComboChanged(); };
+    m_ChordType.onChange();
+    
+    addAndMakeVisible (m_ScaleType);
+    for(int i = 1; i <= Scales::Type::Total; i++)
+    {
+        Scales::Type::eType scaleType = (Scales::Type::eType) i;
+        m_ScaleType.addItem (Helpers::GetScaleTypeString(scaleType),  scaleType);
+    }
+    m_ScaleType.setSelectedId(Scales::Type::Major);
+    m_ScaleType.onChange = [this] { ScaleTypeComboChanged(); };
+    m_ScaleType.onChange();
+    
+    addAndMakeVisible (m_ScaleNote);
+    for(int i = 1; i <= SCALES_OCTAVE_STEPS; i++)
+    {
+        m_ScaleNote.addItem (juce::MidiMessage::getMidiNoteName (i-1, true, false, m_keyboardComponent.getOctaveForMiddleC()),  i);
+    }
+    m_ScaleNote.setSelectedId(1);
+    m_ScaleNote.onChange = [this] { ScaleNoteComboChanged(); };
+    m_ScaleNote.onChange();
+
 }
 
 MidiScalesPluginAudioProcessorEditor::~MidiScalesPluginAudioProcessorEditor()
@@ -61,9 +105,51 @@ void MidiScalesPluginAudioProcessorEditor::resized()
     const int iKeyboardHeight = 200;
     const int iEndKeyExcess = -9;
     
-    m_selectedChord.setBounds (iLabelLeftRightSpacing, iLabelTopSpacing,
-                               (getWidth() - 2*iLabelLeftRightSpacing) + iEndKeyExcess,  iLabelHeight);
+    const int iScaleNoteWidth = 90;
+    const int iScaleChordLabelWidth = 90;
+    const int iScaleTypeWidth = 200;
+    //Unused due to last item in width requiring full alignment
+    //const int iChordTypeWidth = 200;
+    
+    const int iEffectiveWidth = (getWidth() - 2*iLabelLeftRightSpacing) + iEndKeyExcess;
+    
+    int iCurrentLeftSpacing = iLabelLeftRightSpacing;
+    m_ScaleLabel.setBounds(iCurrentLeftSpacing, iLabelTopSpacing, iScaleChordLabelWidth, iLabelHeight);
+    
+    iCurrentLeftSpacing += iScaleChordLabelWidth;
+    m_ScaleNote.setBounds(iCurrentLeftSpacing, iLabelTopSpacing, iScaleNoteWidth, iLabelHeight);
+    
+    iCurrentLeftSpacing += iScaleNoteWidth;
+    m_ScaleType.setBounds(iCurrentLeftSpacing, iLabelTopSpacing, iScaleTypeWidth, iLabelHeight);
+    
+    iCurrentLeftSpacing += iScaleTypeWidth;
+    m_ChordLabel.setBounds(iCurrentLeftSpacing, iLabelTopSpacing, iScaleChordLabelWidth, iLabelHeight);
+    
+    iCurrentLeftSpacing += iScaleChordLabelWidth;
+    m_ChordType.setBounds(iCurrentLeftSpacing, iLabelTopSpacing, iEffectiveWidth - (iCurrentLeftSpacing - iLabelLeftRightSpacing), iLabelHeight);
+    
+    /*m_selectedChord.setBounds (iLabelLeftRightSpacing, iLabelTopSpacing,
+                               iEffectiveWidth,  iLabelHeight);*/
     
     m_keyboardComponent.setBounds (iLabelLeftRightSpacing, iLabelTopSpacing + iLabelHeight + iKeyboardTopSpacing,
-                                 (getWidth() - 2*iLabelLeftRightSpacing) + iEndKeyExcess, iKeyboardHeight);
+                                  iEffectiveWidth, iKeyboardHeight);
+}
+
+void MidiScalesPluginAudioProcessorEditor::ScaleNoteComboChanged()
+{
+    int iSelectedId = m_ScaleNote.getSelectedId();
+    int scaleNote = iSelectedId > 0 ? iSelectedId - 1 : -1;
+    m_audioProcessor.m_iScaleNote.set(scaleNote);
+}
+
+void MidiScalesPluginAudioProcessorEditor::ScaleTypeComboChanged()
+{
+    Scales::Type::eType selectedType = (Scales::Type::eType) m_ScaleType.getSelectedId();
+    m_audioProcessor.m_ScaleType.set(selectedType);
+}
+
+void MidiScalesPluginAudioProcessorEditor::ChordTypeComboChanged()
+{
+    Chords::Type::eType selectedType = (Chords::Type::eType) m_ChordType.getSelectedId();
+    m_audioProcessor.m_ChordType.set(selectedType);
 }
