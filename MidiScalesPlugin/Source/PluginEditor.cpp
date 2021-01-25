@@ -75,7 +75,16 @@ MidiScalesPluginAudioProcessorEditor::MidiScalesPluginAudioProcessorEditor (Midi
     m_ScaleNote.setSelectedId(1);
     m_ScaleNote.onChange = [this] { ScaleNoteComboChanged(); };
     m_ScaleNote.onChange();
-
+    
+    m_ToggleLookAndFeel.setColour(juce::ToggleButton::textColourId, juce::Colours::black);
+    m_ToggleLookAndFeel.setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
+    m_ToggleLookAndFeel.setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
+    
+    addAndMakeVisible(m_ToggleSharps);
+    
+    m_ToggleSharps.setToggleState(true, juce::dontSendNotification);
+    m_ToggleSharps.setLookAndFeel(&m_ToggleLookAndFeel);
+    m_ToggleSharps.onClick = [this] { SharpsToggleClicked(); };
 }
 
 MidiScalesPluginAudioProcessorEditor::~MidiScalesPluginAudioProcessorEditor()
@@ -101,7 +110,7 @@ void MidiScalesPluginAudioProcessorEditor::resized()
     const int iLabelTopSpacing = 20;
     const int iLabelLeftRightSpacing = 50;
     const int iLabelHeight = 50;
-    const int iKeyboardTopSpacing = 30;
+    const int iKeyboardTopSpacing = 10;
     const int iKeyboardHeight = 200;
     const int iEndKeyExcess = -9;
     
@@ -128,10 +137,17 @@ void MidiScalesPluginAudioProcessorEditor::resized()
     iCurrentLeftSpacing += iScaleChordLabelWidth;
     m_ChordType.setBounds(iCurrentLeftSpacing, iLabelTopSpacing, iEffectiveWidth - (iCurrentLeftSpacing - iLabelLeftRightSpacing), iLabelHeight);
     
+    const int iCheckboxHeight = 25;
+    iCurrentLeftSpacing = iLabelLeftRightSpacing;
+    int iCurrentVerticleSpacing = iKeyboardTopSpacing + iLabelTopSpacing + iLabelHeight;
+    
+    m_ToggleSharps.setBounds(iCurrentLeftSpacing, iCurrentVerticleSpacing, 200, iCheckboxHeight);
+    
     /*m_selectedChord.setBounds (iLabelLeftRightSpacing, iLabelTopSpacing,
                                iEffectiveWidth,  iLabelHeight);*/
     
-    m_keyboardComponent.setBounds (iLabelLeftRightSpacing, iLabelTopSpacing + iLabelHeight + iKeyboardTopSpacing,
+    iCurrentVerticleSpacing += iCheckboxHeight + iKeyboardTopSpacing;
+    m_keyboardComponent.setBounds (iCurrentLeftSpacing, iCurrentVerticleSpacing,
                                   iEffectiveWidth, iKeyboardHeight);
 }
 
@@ -140,16 +156,41 @@ void MidiScalesPluginAudioProcessorEditor::ScaleNoteComboChanged()
     int iSelectedId = m_ScaleNote.getSelectedId();
     int scaleNote = iSelectedId > 0 ? iSelectedId - 1 : -1;
     m_audioProcessor.m_iScaleNote.set(scaleNote);
+    
+    SetKeyboardScale();
 }
 
 void MidiScalesPluginAudioProcessorEditor::ScaleTypeComboChanged()
 {
     Scales::Type::eType selectedType = (Scales::Type::eType) m_ScaleType.getSelectedId();
     m_audioProcessor.m_ScaleType.set(selectedType);
+    
+    SetKeyboardScale();
 }
 
 void MidiScalesPluginAudioProcessorEditor::ChordTypeComboChanged()
 {
     Chords::Type::eType selectedType = (Chords::Type::eType) m_ChordType.getSelectedId();
     m_audioProcessor.m_ChordType.set(selectedType);
+}
+
+void MidiScalesPluginAudioProcessorEditor::SetKeyboardScale()
+{
+    int iSelectedId = m_ScaleNote.getSelectedId();
+    int scaleNote = iSelectedId > 0 ? iSelectedId - 1 : -1;
+    juce::String selectedText = m_ScaleNote.getItemText(m_ScaleNote.getSelectedItemIndex());
+    selectedText = selectedText.replace("#", "").replace("b", "");
+    int iBaseNote = Helpers::GetNoteType(selectedText.toRawUTF8());
+    
+    m_keyboardComponent.SetScale(scaleNote, iBaseNote, (Scales::Type::eType) m_ScaleType.getSelectedId());
+}
+
+void MidiScalesPluginAudioProcessorEditor::SharpsToggleClicked()
+{
+    int iPreviousSelectedId = m_ScaleNote.getSelectedItemIndex();
+    for(int i = 1; i <= SCALES_OCTAVE_STEPS; i++)
+    {
+        m_ScaleNote.changeItemText (i, juce::MidiMessage::getMidiNoteName (i-1, m_ToggleSharps.getToggleState(), false,         m_keyboardComponent.getOctaveForMiddleC()));
+    }
+    m_ScaleNote.setSelectedItemIndex(iPreviousSelectedId);
 }

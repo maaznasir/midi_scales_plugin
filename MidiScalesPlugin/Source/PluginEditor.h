@@ -29,6 +29,10 @@ public:
     void ScaleNoteComboChanged();
     void ScaleTypeComboChanged();
     void ChordTypeComboChanged();
+    
+    void SetKeyboardScale();
+    
+    void SharpsToggleClicked();
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -42,6 +46,8 @@ private:
     juce::ComboBox m_ChordType;
     juce::ComboBox m_ScaleType;
     juce::ComboBox m_ScaleNote;
+    juce::LookAndFeel_V4 m_ToggleLookAndFeel;
+    juce::ToggleButton m_ToggleSharps {"Black Keys as Sharps"};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiScalesPluginAudioProcessorEditor)
 };

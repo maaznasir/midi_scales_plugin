@@ -18,6 +18,9 @@ public:
     ScalesKeyboardComponent (juce::MidiKeyboardState& state,
                              juce::MidiKeyboardComponent::Orientation orientation);
     
+    
+    
+    
     virtual juce::String getWhiteNoteText (int midiNoteNumber) override;
     
     juce::String getBlackNoteText (int midiNoteNumber);
@@ -47,4 +50,13 @@ public:
                                 bool isDown, bool isOver,
                                 juce::Colour noteFillColour) override;
     
+    void SetScale(int iRootNote, int iBaseNote, Scales::Type::eType eScaleType);
+    
+    bool HasValidScale();
+    
+private:
+    int m_iScaleBaseNote;
+    int m_iScaleRootNote;
+    Scales::Type::eType m_eScaleType;
+    ScaleNotes m_ScaleNotes;
 };

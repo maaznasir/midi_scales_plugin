@@ -14,16 +14,53 @@ ScalesKeyboardComponent::ScalesKeyboardComponent (juce::MidiKeyboardState& state
                                                   juce::MidiKeyboardComponent::Orientation orientation)
 : juce::MidiKeyboardComponent(state, orientation)
 {
+    m_iScaleRootNote = -1;
+    m_iScaleBaseNote = -1;
+    m_eScaleType = Scales::Type::Invalid;
+    
+    m_ScaleNotes.ensureStorageAllocated(SCALES_OCTAVE_STEPS);
 }
 
 juce::String ScalesKeyboardComponent::getWhiteNoteText (int midiNoteNumber)
 {
-    return juce::MidiMessage::getMidiNoteName (midiNoteNumber, true, false, getOctaveForMiddleC());
+    if(!HasValidScale())
+        return "";
+    
+    const int iNoteNumber = midiNoteNumber % SCALES_OCTAVE_STEPS;
+    const int idx = m_ScaleNotes.indexOf(iNoteNumber);
+    
+    if(idx >= 0)
+    {
+        const int iShiftedMajorNote = (idx + m_iScaleBaseNote) % Notes::Type::Total;
+        
+        juce::String majorNoteType(Helpers::GetNoteString((Notes::Type::eType) iShiftedMajorNote));
+        
+        const int iMajorNoteNumber = Helpers::GetNoteNumber((Notes::Type::eType) iShiftedMajorNote);
+        int iNoteDiff =  iNoteNumber - iMajorNoteNumber;
+        if(abs(iNoteDiff) > 5)
+            iNoteDiff = iNoteDiff > 0 ? iNoteDiff - SCALES_OCTAVE_STEPS : iNoteDiff + SCALES_OCTAVE_STEPS;
+        
+        juce::String noteDiff;
+        if(iNoteDiff == 1)
+            noteDiff = "#";
+        else if(iNoteDiff > 1)
+            noteDiff = "##";
+        else if(iNoteDiff == -1)
+            noteDiff = "b";
+        else if(iNoteDiff < -1)
+            noteDiff = "bb";
+        else
+            noteDiff ="";
+        
+        return majorNoteType + noteDiff;
+    }
+ 
+    return "";
 }
 
 juce::String ScalesKeyboardComponent::getBlackNoteText (int midiNoteNumber)
 {
-    return juce::MidiMessage::getMidiNoteName (midiNoteNumber, true, false, getOctaveForMiddleC());
+    return getWhiteNoteText(midiNoteNumber);
 }
 
 
@@ -139,5 +176,30 @@ void ScalesKeyboardComponent::drawWhiteNote (int midiNoteNumber, juce::Graphics&
             }
         }
     }
+}
+
+void ScalesKeyboardComponent::SetScale(int iRootNote, int iBaseNote, Scales::Type::eType eScaleType)
+{
+    m_iScaleRootNote = iRootNote;
+    m_iScaleBaseNote = iBaseNote;
+    m_eScaleType = eScaleType;
+    
+    Helpers::GetScaleSequence(m_eScaleType, m_ScaleNotes);
+    const int iNumNotes = m_ScaleNotes.size();
+    
+    if(m_iScaleRootNote >= 0)
+    {
+        for(int i=0; i<iNumNotes; i++)
+        {
+            m_ScaleNotes.set(i, (m_ScaleNotes[i] + m_iScaleRootNote) % SCALES_OCTAVE_STEPS);
+        }
+    }
+    
+    repaint();
+}
+
+bool ScalesKeyboardComponent::HasValidScale()
+{
+    return m_iScaleBaseNote >= 0 && m_iScaleRootNote >= 0 && m_ScaleNotes.size() > 0;
 }
 

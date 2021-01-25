@@ -76,6 +76,12 @@ namespace Helpers
         }
     }
     
+    int GetNoteNumber(Notes::Type::eType eType)
+    {
+        const static int s_noteIndices[] = {0, 2, 4, 5, 7, 9, 11};
+        return s_noteIndices[eType];
+    }
+    
     // TODO: These names should come from data
     juce::String GetScaleTypeString(Scales::Type::eType scaleType)
     {
@@ -112,5 +118,24 @@ namespace Helpers
                 return "Invalid";
                 //Do Nothing
         }
+    }
+    
+    juce::String GetNoteString(Notes::Type::eType noteType)
+    {
+        const static char* s_noteText[] = {"C", "D", "E", "F", "G", "A", "B"};
+        return s_noteText[noteType];
+    }
+    
+    int GetNoteType(const char* note)
+    {
+        const static char* s_noteText[] = {"C", "D", "E", "F", "G", "A", "B"};
+        
+        for(int i=0; i<Notes::Type::Total; i++)
+        {
+            if(std::strcmp(s_noteText[i], note) == 0)
+                return i;
+        }
+        
+        return -1;
     }
 }

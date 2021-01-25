@@ -9,14 +9,14 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../../Source/PluginEditor.cpp"
-            timestampString = "633234601.978272"
+            filePath = "../../Source/Utilities.cpp"
+            timestampString = "633249476.0764869"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "20"
-            endingLineNumber = "20"
-            landmarkName = "MidiScalesPluginAudioProcessorEditor::MidiScalesPluginAudioProcessorEditor (MidiScalesPluginAudioProcessor&amp; p)"
-            landmarkType = "7">
+            startingLineNumber = "136"
+            endingLineNumber = "136"
+            landmarkName = "GetNoteType(const char* note)"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -25,46 +25,14 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../../Source/PressedChord.cpp"
-            timestampString = "633234601.978561"
+            filePath = "../../Source/ScalesKeyboardComponent.cpp"
+            timestampString = "633249476.076722"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "55"
-            endingLineNumber = "55"
-            landmarkName = "PressedChord::GenerateMidi(bool bNoteOnOff, int iSamplePosition, double fCurrentTimeStamp, juce::MidiBuffer&amp; processedMidi, juce::MidiBuffer&amp; keyboardStateMidi)"
+            startingLineNumber = "45"
+            endingLineNumber = "45"
+            landmarkName = "ScalesKeyboardComponent::getWhiteNoteText (int midiNoteNumber)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "PressedChord::GenerateMidi(bool, int, juce::MidiBuffer&amp;, juce::MidiBuffer&amp;)"
-                  moduleName = "MidiScalesPlugin"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/maaz/Desktop/Personal%20Projects/midi_scales_plugin/MidiScalesPlugin/Source/PressedChord.cpp"
-                  timestampString = "633224573.6788009"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "55"
-                  endingLineNumber = "55"
-                  offsetFromSymbolStart = "66">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "PressedChord::GenerateMidi(bool, int, juce::MidiBuffer&amp;, juce::MidiBuffer&amp;)"
-                  moduleName = "MidiScalesPlugin"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/maaz/Desktop/Personal%20Projects/midi_scales_plugin/MidiScalesPlugin/Source/PressedChord.cpp"
-                  timestampString = "633224573.6827"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "55"
-                  endingLineNumber = "55"
-                  offsetFromSymbolStart = "121">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

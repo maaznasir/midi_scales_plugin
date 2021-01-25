@@ -56,13 +56,34 @@ namespace Scales
     };
 };
 
+namespace Notes
+{
+    namespace Type
+    {
+        enum eType
+        {
+            C = 0,
+            D,
+            E,
+            F,
+            G,
+            A,
+            B,
+            Total
+        };
+    };
+};
+
 namespace Helpers
 {
     void GetScaleSequence(Scales::Type::eType scaleType, ScaleNotes& scaleComposition);
     void GetChordSequence(Chords::Type::eType chordType, ChordNotes& chordComposition);
+    int GetNoteNumber(Notes::Type::eType);
     
     juce::String GetScaleTypeString(Scales::Type::eType scaleType);
     juce::String GetChordTypeString(Chords::Type::eType chordType);
+    juce::String GetNoteString(Notes::Type::eType noteType);
+    int GetNoteType(const char* note);
 }
 
 
