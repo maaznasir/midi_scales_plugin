@@ -11,8 +11,9 @@
 #include "ScalesKeyboardComponent.h"
 
 ScalesKeyboardComponent::ScalesKeyboardComponent (juce::MidiKeyboardState& state,
-                                                  juce::MidiKeyboardComponent::Orientation orientation)
-: juce::MidiKeyboardComponent(state, orientation)
+                                                  BaseKeyboardComponent::Orientation orientation)
+: BaseKeyboardComponent(state, orientation),
+m_keyboardState(state)
 {
     m_iScaleRootNote = -1;
     m_iScaleBaseNote = -1;
@@ -70,10 +71,23 @@ void ScalesKeyboardComponent::drawBlackNote (int midiNoteNumber, juce::Graphics&
     auto c = noteFillColour;
     
     juce::Colour pressedColour = juce::Colours::lightblue;
-    juce::Colour overColour = juce::Colours::lightblue;
+    juce::Colour invalidColour = juce::Colours::lightgrey;
+    //juce::Colour overColour = juce::Colours::lightblue;
 
-    if (isDown)  c = c.overlaidWith ( pressedColour );
-    if (isOver)  c = c.overlaidWith ( overColour );
+    if (isDown)
+    {
+        const bool bNoteActive = m_keyboardState.isNoteOn(KEYBOARD_UI_NOTE_CHANNEL, midiNoteNumber);
+        if(bNoteActive && !m_ScaleNotes.contains(midiNoteNumber % SCALES_OCTAVE_STEPS))
+        {
+            c = c.overlaidWith ( invalidColour );
+        }
+        else
+        {
+            c = c.overlaidWith ( pressedColour );
+        }
+    }
+    
+    //if (isOver)  c = c.overlaidWith ( overColour );
     
     g.setColour (c);
     g.fillRect (area);
@@ -106,7 +120,10 @@ void ScalesKeyboardComponent::drawBlackNote (int midiNoteNumber, juce::Graphics&
     {
         auto fontHeight = juce::jmin (16.0f, getKeyWidth() * 0.9f);
         
-        juce::Colour textColour(isDown ? juce::Colours::black : juce::Colours::white);
+
+        const bool bRootNoteOn = isDown ? m_keyboardState.isNoteOn(KEYBOARD_UI_NOTE_CHANNEL, midiNoteNumber) : false;
+        
+        juce::Colour textColour(isDown ? (bRootNoteOn ? juce::Colours::red : juce::Colours::black) : juce::Colours::white);
         g.setColour (textColour);
         g.setFont (juce::Font (fontHeight).withHorizontalScale (1.0f));
         
@@ -127,10 +144,23 @@ void ScalesKeyboardComponent::drawWhiteNote (int midiNoteNumber, juce::Graphics&
     auto c = juce::Colours::transparentWhite;
     
     juce::Colour pressedColour = juce::Colours::lightblue;
-    juce::Colour overColour = juce::Colours::lightblue;
+    juce::Colour invalidColour = juce::Colours::lightgrey;
+    //juce::Colour overColour = juce::Colours::lightblue;
     
-    if (isDown)  c = pressedColour;
-    if (isOver)  c = c.overlaidWith (overColour);
+    if (isDown)
+    {
+        const bool bNoteActive = m_keyboardState.isNoteOn(KEYBOARD_UI_NOTE_CHANNEL, midiNoteNumber);
+        if(bNoteActive && !m_ScaleNotes.contains(midiNoteNumber % SCALES_OCTAVE_STEPS))
+        {
+            c = c.overlaidWith ( invalidColour );
+        }
+        else
+        {
+            c = c.overlaidWith ( pressedColour );
+        }
+    }
+    
+    //if (isOver)  c = c.overlaidWith (overColour);
     
     g.setColour (c);
     g.fillRect (area);
@@ -140,8 +170,10 @@ void ScalesKeyboardComponent::drawWhiteNote (int midiNoteNumber, juce::Graphics&
     if (text.isNotEmpty())
     {
         auto fontHeight = juce::jmin (16.0f, getKeyWidth() * 0.9f);
+        const bool bRootNoteOn = isDown ? m_keyboardState.isNoteOn(KEYBOARD_UI_NOTE_CHANNEL, midiNoteNumber) : false;
         
-        g.setColour (textColour);
+        juce::Colour updatedTextColour(bRootNoteOn ? juce::Colours::red : juce::Colours::black);
+        g.setColour (updatedTextColour);
         g.setFont (juce::Font (fontHeight).withHorizontalScale (1.0f));
         
         switch (getOrientation())

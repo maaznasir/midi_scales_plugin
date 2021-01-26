@@ -52,6 +52,8 @@ void PressedChord::GenerateMidi(bool bNoteOnOff, int iSamplePosition, double fCu
     if(!IsValid())
         return;
     
+    const juce::uint8 uZeroVelocity = 0;
+    
     for(auto iChordNote : m_notesPressed)
     {
         juce::MidiMessage p, k;
@@ -62,22 +64,35 @@ void PressedChord::GenerateMidi(bool bNoteOnOff, int iSamplePosition, double fCu
             p.setTimeStamp(fCurrentTimeStamp);
             processedMidi.addEvent (p, iSamplePosition);
             
-            k = juce::MidiMessage::noteOn(m_iChannel, ((m_iRootNote % SCALES_DOUBLE_OCTAVE_STEPS) + iChordNote) % SCALES_OCTAVE_STEPS_RANGE, m_uVelocity);
+            k = juce::MidiMessage::noteOn(KEYBOARD_UI_CHORD_CHANNEL, ((m_iRootNote % SCALES_DOUBLE_OCTAVE_STEPS) + iChordNote) % SCALES_OCTAVE_STEPS_RANGE, m_uVelocity);
             k.setTimeStamp(m_dTimeStamp);
             keyboardStateMidi.addEvent(k, iSamplePosition);
         }
         else
         {
-            const juce::uint8 uZeroVelocity = 0;
-            
             p = juce::MidiMessage::noteOff(m_iChannel, (m_iRootNote + iChordNote) % SCALES_TOTAL_STEPS , uZeroVelocity);
-            p.setTimeStamp(m_dTimeStamp);
+            p.setTimeStamp(fCurrentTimeStamp);
             processedMidi.addEvent (p, iSamplePosition);
             
-            k = juce::MidiMessage::noteOff(m_iChannel, ((m_iRootNote % SCALES_DOUBLE_OCTAVE_STEPS) + iChordNote) % SCALES_OCTAVE_STEPS_RANGE, uZeroVelocity);
-            k.setTimeStamp(m_dTimeStamp);
+            k = juce::MidiMessage::noteOff(KEYBOARD_UI_CHORD_CHANNEL, ((m_iRootNote % SCALES_DOUBLE_OCTAVE_STEPS) + iChordNote) % SCALES_OCTAVE_STEPS_RANGE, uZeroVelocity);
+            k.setTimeStamp(fCurrentTimeStamp);
             keyboardStateMidi.addEvent(k, iSamplePosition);
         }
 
     }
+    
+    juce::MidiMessage k;
+    
+    if(bNoteOnOff)
+    {
+        k = juce::MidiMessage::noteOn(KEYBOARD_UI_NOTE_CHANNEL, m_iRootNote % SCALES_DOUBLE_OCTAVE_STEPS, m_uVelocity);
+        k.setTimeStamp(m_dTimeStamp);
+    }
+    else
+    {
+        k = juce::MidiMessage::noteOff(KEYBOARD_UI_NOTE_CHANNEL, m_iRootNote % SCALES_DOUBLE_OCTAVE_STEPS, uZeroVelocity);
+        k.setTimeStamp(fCurrentTimeStamp);
+    }
+    
+    keyboardStateMidi.addEvent(k, iSamplePosition);
 }

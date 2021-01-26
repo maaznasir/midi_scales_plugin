@@ -55,14 +55,18 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
+    void SetScaleSafe(int iScaleNote, Scales::Type::eType scaleType);
+    bool IsNoteInScaleSafe(int iMidiNote);
+    
     juce::MidiKeyboardState m_keyboardState;
-    juce::Atomic<int> m_iScaleNote;
-    juce::Atomic<Scales::Type::eType> m_ScaleType;
     juce::Atomic<Chords::Type::eType> m_ChordType;
 
 private:
-    
+    juce::CriticalSection m_ScalesLock;
+    int m_iScaleNote;
+    Scales::Type::eType m_ScaleType;
     PressedChord m_currentChord;
+    ScaleNotes m_ScaleNotes;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiScalesPluginAudioProcessor)

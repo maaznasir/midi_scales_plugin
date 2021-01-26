@@ -21,6 +21,9 @@
 #define SCALES_OCTAVE_NORMALIZED_START 0
 #define SCALES_TOTAL_STEPS 128
 
+#define KEYBOARD_UI_CHORD_CHANNEL 1
+#define KEYBOARD_UI_NOTE_CHANNEL 2
+
 typedef juce::Array<int> ChordNotes;
 typedef juce::Array<int> ScaleNotes;
 

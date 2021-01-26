@@ -25,9 +25,10 @@ MidiScalesPluginAudioProcessor::MidiScalesPluginAudioProcessor()
 #endif
 {
     m_keyboardState.reset();
+    m_ScaleNotes.ensureStorageAllocated(SCALES_OCTAVE_STEPS);
     
-    m_iScaleNote.set(-1);
-    m_ScaleType.set(Scales::Type::Invalid);
+    m_iScaleNote = -1;
+    m_ScaleType = Scales::Type::Invalid;
     m_ChordType.set(Chords::Type::Invalid);
 }
 
@@ -162,8 +163,19 @@ void MidiScalesPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
                 m_currentChord.Reset();
             }
             
-            m_currentChord.Setup(m.getNoteNumber(), m.getChannel(), chordType, m.getVelocity(), m.getTimeStamp());
-            m_currentChord.GenerateMidi(true , iSamplePosition, m.getTimeStamp(), processedMidi, keyboardStateMidi);
+            const bool bIsNoteInScale = IsNoteInScaleSafe(m.getNoteNumber());
+            if(bIsNoteInScale)
+            {
+                m_currentChord.Setup(m.getNoteNumber(), m.getChannel(), chordType, m.getVelocity(), m.getTimeStamp());
+                m_currentChord.GenerateMidi(true , iSamplePosition, m.getTimeStamp(), processedMidi, keyboardStateMidi);
+            }
+            else
+            {
+                // Generate UI Message
+                juce::MidiMessage k = juce::MidiMessage::noteOn(KEYBOARD_UI_NOTE_CHANNEL, m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS, m.getVelocity());
+                k.setTimeStamp(m.getTimeStamp());
+                keyboardStateMidi.addEvent(k, iSamplePosition);
+            }
         }
         else if(m.isNoteOff())
         {
@@ -172,11 +184,19 @@ void MidiScalesPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
                 m_currentChord.GenerateMidi(false, iSamplePosition, m.getTimeStamp(), processedMidi, keyboardStateMidi);
                 m_currentChord.Reset();
             }
+            
+            const bool bIsNoteInScale = IsNoteInScaleSafe(m.getNoteNumber());
+            if(!bIsNoteInScale)
+            {
+                // Generate UI Message
+                juce::MidiMessage k = juce::MidiMessage::noteOff(KEYBOARD_UI_NOTE_CHANNEL, m.getNoteNumber() % SCALES_DOUBLE_OCTAVE_STEPS, uint8_t(0));
+                k.setTimeStamp(m.getTimeStamp());
+                keyboardStateMidi.addEvent(k, iSamplePosition);
+            }
         }
     }
     
     midiMessages.swapWith (processedMidi);
-    
     m_keyboardState.processNextMidiBuffer (keyboardStateMidi, 0, buffer.getNumSamples(), true);
 }
 
@@ -205,9 +225,36 @@ void MidiScalesPluginAudioProcessor::setStateInformation (const void* data, int 
     // whose contents will have been created by the getStateInformation() call.
 }
 
+void MidiScalesPluginAudioProcessor::SetScaleSafe(int iScaleNote, Scales::Type::eType scaleType)
+{
+    juce::ScopedLock lock(m_ScalesLock);
+    
+    m_iScaleNote = iScaleNote;
+    m_ScaleType = scaleType;
+    
+    Helpers::GetScaleSequence(m_ScaleType, m_ScaleNotes);
+    const int iNumNotes = m_ScaleNotes.size();
+    
+    if(m_iScaleNote >= 0)
+    {
+        for(int i=0; i<iNumNotes; i++)
+        {
+            m_ScaleNotes.set(i, (m_ScaleNotes[i] + m_iScaleNote) % SCALES_OCTAVE_STEPS);
+        }
+    }
+}
+
+bool MidiScalesPluginAudioProcessor::IsNoteInScaleSafe(int iMidiNote)
+{
+    juce::ScopedLock lock(m_ScalesLock);
+    return  m_ScaleNotes.contains(iMidiNote % SCALES_OCTAVE_STEPS);
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new MidiScalesPluginAudioProcessor();
 }
+
+

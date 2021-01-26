@@ -11,12 +11,13 @@
 #pragma once
 
 #include "Utilities.h"
+#include "BaseKeyboardComponent.h"
 
-class ScalesKeyboardComponent : public juce::MidiKeyboardComponent
+class ScalesKeyboardComponent : public BaseKeyboardComponent
 {
 public:
     ScalesKeyboardComponent (juce::MidiKeyboardState& state,
-                             juce::MidiKeyboardComponent::Orientation orientation);
+                             BaseKeyboardComponent::Orientation orientation);
     
     
     
@@ -55,8 +56,10 @@ public:
     bool HasValidScale();
     
 private:
+    const juce::MidiKeyboardState& m_keyboardState;
+    ScaleNotes m_ScaleNotes;
     int m_iScaleBaseNote;
     int m_iScaleRootNote;
+
     Scales::Type::eType m_eScaleType;
-    ScaleNotes m_ScaleNotes;
 };

@@ -14,7 +14,7 @@
 MidiScalesPluginAudioProcessorEditor::MidiScalesPluginAudioProcessorEditor (MidiScalesPluginAudioProcessor& p)
     : AudioProcessorEditor (&p),
       m_audioProcessor (p),
-      m_keyboardComponent(p.m_keyboardState,  juce::MidiKeyboardComponent::horizontalKeyboard)
+      m_keyboardComponent(p.m_keyboardState,  BaseKeyboardComponent::horizontalKeyboard)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -155,15 +155,20 @@ void MidiScalesPluginAudioProcessorEditor::ScaleNoteComboChanged()
 {
     int iSelectedId = m_ScaleNote.getSelectedId();
     int scaleNote = iSelectedId > 0 ? iSelectedId - 1 : -1;
-    m_audioProcessor.m_iScaleNote.set(scaleNote);
+    Scales::Type::eType selectedType = (Scales::Type::eType) m_ScaleType.getSelectedId();
+    
+    m_audioProcessor.SetScaleSafe(scaleNote, selectedType);
     
     SetKeyboardScale();
 }
 
 void MidiScalesPluginAudioProcessorEditor::ScaleTypeComboChanged()
 {
+    int iSelectedId = m_ScaleNote.getSelectedId();
+    int scaleNote = iSelectedId > 0 ? iSelectedId - 1 : -1;
     Scales::Type::eType selectedType = (Scales::Type::eType) m_ScaleType.getSelectedId();
-    m_audioProcessor.m_ScaleType.set(selectedType);
+    
+    m_audioProcessor.SetScaleSafe(scaleNote, selectedType);
     
     SetKeyboardScale();
 }

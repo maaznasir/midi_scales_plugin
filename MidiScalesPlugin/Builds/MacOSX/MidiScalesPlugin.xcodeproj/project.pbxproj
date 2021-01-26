@@ -77,6 +77,10 @@
 			isa = PBXBuildFile;
 			fileRef = 11B853D8531D446A305288D0;
 		};
+		9900D76FD0602D5BC41E7D20 = {
+			isa = PBXBuildFile;
+			fileRef = 8901EF7451C04154BBCAD2D5;
+		};
 		EA45B527900D574BB7D86C9A = {
 			isa = PBXBuildFile;
 			fileRef = 41A04C54874545C561108634;
@@ -372,6 +376,13 @@
 			path = System/Library/Frameworks/IOKit.framework;
 			sourceTree = SDKROOT;
 		};
+		8901EF7451C04154BBCAD2D5 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = BaseKeyboardComponent.cpp;
+			path = ../../Source/BaseKeyboardComponent.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		8BB405182635CEBAAAC0973B = {
 			isa = PBXFileReference;
 			explicitFileType = wrapper.application;
@@ -603,6 +614,13 @@
 			path = "Info-Standalone_Plugin.plist";
 			sourceTree = "SOURCE_ROOT";
 		};
+		F85BBB49BC70271DD6393DAF = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = BaseKeyboardComponent.h;
+			path = ../../Source/BaseKeyboardComponent.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		FF1677710B8C1E39F3C68C7A = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.objcpp;
@@ -613,6 +631,8 @@
 		00B7F238B765983F47DCA658 = {
 			isa = PBXGroup;
 			children = (
+				8901EF7451C04154BBCAD2D5,
+				F85BBB49BC70271DD6393DAF,
 				41A04C54874545C561108634,
 				51851943E3BF66D144A2D36E,
 				C9687F3492FEC9BD9F141AA6,
@@ -2042,6 +2062,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9900D76FD0602D5BC41E7D20,
 				EA45B527900D574BB7D86C9A,
 				4FD4616B5846DCAC0EDB5A8A,
 				EE4CF01A9BA2F29BA3B2E945,

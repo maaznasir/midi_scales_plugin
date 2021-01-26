@@ -7,6 +7,10 @@
               pluginVST3Category="Instrument" displaySplashScreen="0">
   <MAINGROUP id="oMwB5y" name="MidiScalesPlugin">
     <GROUP id="{6F177D44-E126-445A-F541-975179D2D4AC}" name="Source">
+      <FILE id="rZfZJ8" name="BaseKeyboardComponent.cpp" compile="1" resource="0"
+            file="Source/BaseKeyboardComponent.cpp"/>
+      <FILE id="up4eU9" name="BaseKeyboardComponent.h" compile="0" resource="0"
+            file="Source/BaseKeyboardComponent.h"/>
       <FILE id="XDAkUA" name="Utilities.cpp" compile="1" resource="0" file="Source/Utilities.cpp"/>
       <FILE id="hf06YX" name="Utilities.h" compile="0" resource="0" file="Source/Utilities.h"/>
       <FILE id="jeLOEk" name="PressedChord.cpp" compile="1" resource="0"

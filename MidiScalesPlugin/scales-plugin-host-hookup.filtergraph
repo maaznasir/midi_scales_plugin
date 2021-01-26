@@ -62,10 +62,10 @@
     </LAYOUT>
   </FILTER>
   <FILTER uid="6" x="0.5848032564450475" y="0.4980769230769231" uiLastX_Normal="127"
-          uiLastY_Normal="119" uiopen_Normal="0">
+          uiLastY_Normal="119" uiopen_Normal="1">
     <PLUGIN name="MidiScalesPlugin" format="VST3" category="Instrument" manufacturer="TechnoBros"
             version="1.0.0" file="/Users/maaz/Library/Audio/Plug-Ins/VST3/MidiScalesPlugin.vst3"
-            uid="acf4fc52" isInstrument="1" fileTime="177384360e4" infoUpdateTime="17738468945"
+            uid="acf4fc52" isInstrument="1" fileTime="1773ccca426" infoUpdateTime="1773cce4a29"
             numInputs="2" numOutputs="2" isShell="0"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>
     <LAYOUT>
